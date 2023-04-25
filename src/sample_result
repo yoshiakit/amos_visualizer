@@ -1,0 +1,22 @@
+digraph {
+	node [fontname="MS Gothic" shape=box]
+	edge [fontname="MS Gothic"]
+	a -> d [label="係数：0.3
+構成比率: 50.0%
+目的変数に対する寄与比率: 50.0%" dir=back]
+	a -> c [label="係数：0.2
+構成比率: 33.333%
+目的変数に対する寄与比率: 33.333%" dir=back]
+	a -> b [label="係数：0.1
+構成比率: 16.667%
+目的変数に対する寄与比率: 16.667%" dir=back]
+	c -> g [label="係数：0.6
+構成比率: 100.0%
+目的変数に対する寄与比率: 33.333%" dir=back]
+	b -> e [label="係数：0.4
+構成比率: 44.444%
+目的変数に対する寄与比率: 7.407%" dir=back]
+	b -> f [label="係数：0.5
+構成比率: 55.556%
+目的変数に対する寄与比率: 9.26%" dir=back]
+}

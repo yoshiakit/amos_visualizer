@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from collections import deque
+from graphviz import Digraph
 
 def _dps(child, Q, depth_dict, df):
         '''
@@ -24,9 +25,7 @@ def _dps(child, Q, depth_dict, df):
         # print(f'Q is now {Q}')
         return
 
-def calculate(
-        path_data,
-):
+def calculate(path_data):
     df=pd.read_excel(path_data)
     list_items= list(set(list(df['parent']) + list(df['child'])))
     # print(f'list_items: \n{list_items}')
@@ -61,6 +60,7 @@ def calculate(
         # print(f'depth: {depth}, columns: {compare_cols}')
 
         for child_col in compare_cols:
+            # print(child_col)
             if depth==0:
                 parent_col='n/a'
                 coef=1
@@ -77,22 +77,36 @@ def calculate(
     
     # 深さ0の変数に対する比率
     def _get_root_ratio(row):
-        parent_ratio=df.loc[df['child_col']==row['parent_col'],'coef_composition_ratio'].sum()
+        parent_ratio=res_df.loc[res_df['child_col']==row['parent_col'],'coef_composition_ratio'].sum()
         return parent_ratio * row['coef_composition_ratio'] 
 
-    df['root_ratio'] = df.apply(_get_root_ratio,axis=1).astype('float64').round(5).replace(0, 1)
+    res_df['root_ratio'] = res_df.apply(_get_root_ratio,axis=1).astype('float64').round(5).replace(0, 1)
 
     return res_df
-    # print(res_df)
+    
+def visualize(df, output_path='./tree'): 
+    G = Digraph(format="png")
+    G.attr("node", shape="box", fontname="MS Gothic")
+    G.attr("edge", fontname="MS Gothic")
 
-    # print(res_df.head)
+    for depth in np.unique(df['depth'].sort_values(ascending=True)):
+        if depth == 0:
+            continue
 
-    #print(res_df.loc[res_df['child_col']==_parent_col, 'root_ratio'].item())
+        _df = df.loc[df['depth']==depth, :]
+        for _, row in _df.iterrows():
+            G.edge( row['parent_col'], row['child_col'],
+                label=f"係数：{np.round(row['coef'], 3)}\n" + \
+                    f"構成比率: {np.round(100 * row['coef_composition_ratio'], 3)}%\n" + \
+                    f"目的変数に対する寄与比率: {np.round(100 * row['root_ratio'], 3)}%",
+                    dir='back'
+                    )
+    G.render(output_path)
 
-    # res_df.to_csv('./res.csv',encoding='SJIS')
 
-    return
 
 if __name__=='__main__':
     df=calculate(path_data='../data/sample_data.xlsx')
+    df.to_csv('../data/res_v2.csv',encoding='SJIS')
+    visualize(df, output_path='./sample_result')
 
